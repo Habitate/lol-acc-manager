@@ -24,8 +24,8 @@
 
 using namespace std;
 
-const auto PASTE_TIMEOUT = 150;
-const string api_file = "apikey.txt";
+const chrono::milliseconds PASTE_TIMEOUT{150};
+const string API_FILE{"apikey.txt"};
 
 void to_clipboard(const std::string& string){
 	OpenClipboard(0);
@@ -85,11 +85,11 @@ int main(){
     //* Init interface
     system("cls");
     con::show_cursor(false);
-    con::set_dimensions(43, accounts.size() + 2);
+    con::set_dimensions(44, accounts.size() > 5 ? accounts.size() + 2 : 9);
     con::set_title("Found " + to_string(accounts.size()) + " accounts!");
     
     //* Get the api key and assert it's correctness
-    const string api_key = read_api_key(api_file);
+    const string api_key = read_api_key(API_FILE);
     assert_api_status(api_key);
     
     //* Retrieve the data about all the accounts in separate threads
@@ -105,7 +105,7 @@ int main(){
     const short line_length = accounts.size() < 9 ? 9 : accounts.size();
     const COORD line_starting_point = {22, 0};
 
-    const COORD last_row_pos = {0, static_cast<short>(accounts.size() + 1)};
+    const COORD last_row_pos = {0, static_cast<short>(accounts.size() > 5 ? accounts.size() + 1 : 8)};
 
     while(true){
         system("cls");
@@ -145,7 +145,7 @@ int main(){
             if(input.held(VK_CONTROL) && input.pressed('V')){
                 con::draw_text(last_row_pos, "Copied password!", C::RED);
 
-                this_thread::sleep_for(chrono::milliseconds(PASTE_TIMEOUT));
+                this_thread::sleep_for(PASTE_TIMEOUT);
                 to_clipboard(selected_acc.get_password());
             }
         }
